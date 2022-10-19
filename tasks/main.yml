@@ -72,6 +72,9 @@
     creates=/var/opt/gitlab/bootstrapped
   failed_when: false
 
+- name: Ensure that the gitlab user is enabled with ssh and without password
+  command: usermod -p '*' git
+
 - name: Create GitLab SSL configuration folder.
   file:
     path: /etc/gitlab/ssl
