@@ -99,3 +99,17 @@
     group: root
     mode: 0600
   notify: restart gitlab
+
+- name: Daily backup to local directory
+  ansible.builtin.cron:
+    cron_file: "gitlab-backup"
+    name: "gitlab-backup"
+    user: "root"
+    minute: "0"
+    hour: "3"
+    job: "/usr/bin/gitlab-backup > /var/log/gitlab-backup 2>&1"
+
+- name: Logrotate for gitlab backup output
+  ansible.builtin.copy:
+    src:  logrotate-gitlab-backup
+    dest: /etc/logrotate.d/gitlab-backup
