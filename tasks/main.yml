@@ -10,6 +10,13 @@
   stat: path=/usr/bin/gitlab-ctl
   register: gitlab_file
 
+# Install additional packages
+- name: Install additilnal packages
+  package:
+    name: "{{item}}"
+    state: present
+  with_items: "{{additional_packages}}"
+
 # Install GitLab and its dependencies.
 - name: Install GitLab dependencies.
   package:
@@ -113,3 +120,27 @@
   ansible.builtin.copy:
     src:  logrotate-gitlab-backup
     dest: /etc/logrotate.d/gitlab-backup
+
+- block:
+  - name: Directory for gandi certbot dns configuration
+    file:
+      path: "{{certbot_gandi_dns_ini_dir}}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0700
+
+  - name: Template gandi certbot dns ini file for certbot
+    template:
+      src: certbot-gandi-dns-ini.j2
+      dest: "{{certbot_gandi_dns_ini_dir}}/{{certbot_gandi_dns_ini_file}}"
+      owner: root
+      group: root
+      mode: 0600
+
+  - name: Provision new cert for Gandi domain
+    command: >
+      "certbot certonly --authenticator dns-gandi --dns-gandi-credentials {{certbot_gandi_dns_ini_dir}}/{{certbot_gandi_dns_ini_file}} -d {{gitlab_domain}} -m {{letsencrypt_contact_address}} --agree-tos"
+      creates="{{gitlab_ssl_certificate}}"
+    failed_when: false
+  when: use_gandi_dns_verified_letsencrypt

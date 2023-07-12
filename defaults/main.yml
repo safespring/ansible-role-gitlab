@@ -17,6 +17,11 @@ gitlab_ssl_certificate_key: "/etc/gitlab/ssl/{{ gitlab_domain }}.key"
 gitlab_create_self_signed_cert: true
 gitlab_self_signed_cert_subj: "/C=US/ST=Missouri/L=Saint Louis/O=IT/CN={{ gitlab_domain }}"
 
+# Enable use of standalone letsencrypt certs with python3-certbot-dns-gandi
+use_gandi_dns_verified_letsencrypt: false
+certbot_gandi_dns_ini_dir: "/etc/letsencrypt/gandi"
+certbot_gandi_dns_ini_file: "gandi.ini"
+
 # LDAP Configuration.
 gitlab_ldap_enabled: false
 gitlab_ldap_host: "example.com"
